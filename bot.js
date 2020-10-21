@@ -1,4 +1,5 @@
-require('dotenv').config();
+var randomColor = require('randomcolor'); // import the script
+var color = randomColor(); // a hex code for an attractive color
 const Canvas = require('canvas')
 const Discord = require('discord.js');
 const client = new Discord.Client({
@@ -416,7 +417,8 @@ else if(command == 'avatar'){
 	if (!channel) return;
 
 	const canvas = Canvas.createCanvas(700, 250);
-	const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d');
+    var context = ctx
     
 	const background = await Canvas.loadImage('./welcomepic.png');
 	ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
@@ -432,7 +434,7 @@ else if(command == 'avatar'){
 	// Add an exclamation point here and below
 	ctx.font = applyText(canvas, `${member.displayName}!`);
 	ctx.fillStyle = '#ffffff';
-	ctx.fillText(`${member.displayName}!`, canvas.width / 2.5, canvas.height / 1.8);
+	ctx.fillText(`${member.displayName}!`, canvas.width / 2.5, canvas.height / 1.8, );
 
 	ctx.beginPath();
 	ctx.arc(125, 125, 100, 0, Math.PI * 2, true);
@@ -444,7 +446,7 @@ else if(command == 'avatar'){
 
 	const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'welcome-image.png');
 
-	channel.send(`Here is your avatar ${member}`, attachment);
+	channel.send(`Here is your avatar, ${member}`, attachment);
     }
 }
 
@@ -465,7 +467,7 @@ else if(command == 'avatar'){
         
         
     }
-    
+
     else if(command == 'hastebin'){
         
         let haste = args.slice(0).join(" ")
@@ -509,6 +511,90 @@ else if(command == 'avatar'){
             message.channel.send('Hey, you don\'t have the staff role. If you think this is a mistake, join https://discord.gg/6xgZaA5 and dm spacehold (the owner of the bot).')
         }
         
+    }
+    else if(command == 'randomcolor' || command == 'color'){
+        
+        const width = 1200
+const height = 600
+
+const canvas = Canvas.createCanvas(width, height)
+const ctx = canvas.getContext('2d')
+
+var context = ctx
+context.fillStyle = randomColor({
+    luminosity: 'random',
+    hue: 'random',
+    format: 'hex'
+ });;
+context.fillRect(0, 0, width, height)
+
+const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'welcome-image.png');
+
+message.channel.send("3", attachment).then(message =>{
+    setTimeout(() => {
+        
+        const width = 1200
+const height = 600
+
+const canvas = Canvas.createCanvas(width, height)
+const ctx = canvas.getContext('2d')
+
+var context = ctx
+context.fillStyle = randomColor({
+    luminosity: 'random',
+    hue: 'random',
+    format: 'hex'
+ });;
+context.fillRect(0, 0, width, height)
+
+const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'welcome-image.png');
+message.edit("2", attachment).then(message =>{
+    setTimeout(() => {
+        
+    
+    const width = 1200
+    const height = 600
+    
+    const canvas = Canvas.createCanvas(width, height)
+    const ctx = canvas.getContext('2d')
+    
+    var context = ctx
+    context.fillStyle = randomColor({
+        luminosity: 'random',
+        hue: 'random',
+        format: 'hex'
+     });;
+    context.fillRect(0, 0, width, height)
+    
+    const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'welcome-image.png');
+    message.edit("", attachment).then(message =>{
+        
+        const width = 1200
+const height = 600
+
+const canvas = Canvas.createCanvas(width, height)
+const ctx = canvas.getContext('2d')
+
+var context = ctx
+context.fillStyle = randomColor({
+    luminosity: 'random',
+    hue: 'random',
+    format: 'hex'
+ });;
+context.fillRect(0, 0, width, height)
+
+const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'welcome-image.png');
+}, 5000);
+message.edit("1", attachment).then(message =>{
+    setTimeout(() => {
+        message.delete()})
+    }, 5000);
+    
+    })
+})
+    }, 3000);
+})
+
     }
     else if(command == 'clear' || command == 'purge'){
         if(message.member.permissions.has("MANAGE_MESSAGES") || message.member.permissions.has("ADMINISTRATOR") || message.author.id == conf.OwnerID){
