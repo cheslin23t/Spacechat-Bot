@@ -6,6 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "engines": {
+    "node": "12.19",
+    "npm": "*"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -14,6 +18,7 @@
     "dblapi.js": "^2.4.1",
     "discord-jokes": "^1.0.12",
     "discord.js": "^12.4.0",
+    "dotenv": "^8.2.0",
     "ffmpeg-static": "^4.2.7",
     "fs": "0.0.1-security",
     "hastebin-gen": "^2.0.5",
