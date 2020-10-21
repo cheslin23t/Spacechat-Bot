@@ -1,0 +1,35 @@
+{
+  "name": "spacechat-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "avconv": "^3.1.0",
+    "canvas": "^2.6.1",
+    "dblapi.js": "^2.4.1",
+    "discord-jokes": "^1.0.12",
+    "discord.js": "^12.4.0",
+    "ffmpeg-static": "^4.2.7",
+    "fs": "0.0.1-security",
+    "hastebin-gen": "^2.0.5",
+    "jimp": "^0.16.1",
+    "jokes": "0.0.2",
+    "link-preview-generator": "0.0.4",
+    "mongo": "^0.1.0",
+    "mongodb": "^3.6.2",
+    "mongoose": "^5.10.9",
+    "node-server-screenshot": "^0.2.4",
+    "path": "^0.12.7",
+    "pm2": "^4.5.0",
+    "puppeteer": "^5.3.1",
+    "random-joke-getter": "^2.0.3",
+    "sqlite3": "^5.0.0",
+    "util": "^0.12.3",
+    "win32-api": "^9.5.0"
+  }
+}
