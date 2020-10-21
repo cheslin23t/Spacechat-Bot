@@ -530,70 +530,8 @@ context.fillRect(0, 0, width, height)
 
 const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'welcome-image.png');
 
-message.channel.send("3", attachment).then(message =>{
-    setTimeout(() => {
-        
-        const width = 1200
-const height = 600
+message.channel.send("Heres your color.", attachment)
 
-const canvas = Canvas.createCanvas(width, height)
-const ctx = canvas.getContext('2d')
-
-var context = ctx
-context.fillStyle = randomColor({
-    luminosity: 'random',
-    hue: 'random',
-    format: 'hex'
- });;
-context.fillRect(0, 0, width, height)
-
-const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'welcome-image.png');
-message.edit("2", attachment).then(message =>{
-    setTimeout(() => {
-        
-    
-    const width = 1200
-    const height = 600
-    
-    const canvas = Canvas.createCanvas(width, height)
-    const ctx = canvas.getContext('2d')
-    
-    var context = ctx
-    context.fillStyle = randomColor({
-        luminosity: 'random',
-        hue: 'random',
-        format: 'hex'
-     });;
-    context.fillRect(0, 0, width, height)
-    
-    const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'welcome-image.png');
-    message.edit("", attachment).then(message =>{
-        
-        const width = 1200
-const height = 600
-
-const canvas = Canvas.createCanvas(width, height)
-const ctx = canvas.getContext('2d')
-
-var context = ctx
-context.fillStyle = randomColor({
-    luminosity: 'random',
-    hue: 'random',
-    format: 'hex'
- });;
-context.fillRect(0, 0, width, height)
-
-const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'welcome-image.png');
-}, 5000);
-message.edit("1", attachment).then(message =>{
-    setTimeout(() => {
-        message.delete()})
-    }, 5000);
-    
-    })
-})
-    }, 3000);
-})
 
     }
     else if(command == 'clear' || command == 'purge'){
@@ -1620,6 +1558,7 @@ client.on('message', (message) => {
 
 client.on("message", message =>{
     if(message.author.bot) return;
+    if(!message.channel.type == 'text') return
     if(!message.guild.id == '671807797482094592') return;
     if(!message.mentions.members.first()) return;
     var logs = message.guild.channels.cache.get('764143101894721578')
