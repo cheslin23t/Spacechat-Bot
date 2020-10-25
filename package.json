@@ -1,47 +1,34 @@
 {
   "name": "spacechat-bot",
   "version": "1.0.0",
-  "description": "",
+  "description": "Spacemod",
   "main": "bot.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node bot.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "engines": {
-    "node": "12.19",
-    "npm": "6.14.8"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cheslin23t/Spacechat-Bot.git"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cheslin23t/Spacechat-Bot/issues"
+  },
+  "homepage": "https://github.com/cheslin23t/Spacechat-Bot#readme",
   "dependencies": {
-    "avconv": "^3.1.0",
     "canvas": "^2.6.1",
-    "config": "^3.3.2",
-    "dblapi.js": "^2.4.1",
     "discord-jokes": "^1.0.12",
     "discord-meme-generator": "^1.1.0",
-    "discord.js": "^12.4.0",
-    "dotenv": "^8.2.0",
+    "discord.js": "^12.4.1",
     "express": "^4.17.1",
-    "ffmpeg-static": "^4.2.7",
-    "fs": "0.0.1-security",
     "hastebin-gen": "^2.0.5",
+    "http": "^0.0.1-security",
     "jimp": "^0.16.1",
-    "jokes": "0.0.2",
-    "link-preview-generator": "0.0.4",
-    "mongo": "^0.1.0",
-    "mongodb": "^3.6.2",
     "mongoose": "^5.10.10",
-    "node-opus": "^0.3.3",
-    "node-server-screenshot": "^0.2.4",
-    "path": "^0.12.7",
-    "pm2": "^4.5.0",
-    "puppeteer": "^5.3.1",
-    "random-joke-getter": "^2.0.3",
+    "node-superfetch": "^0.1.10",
+    "puppeteer": "^5.4.0",
     "randomcolor": "^0.6.2",
-    "sqlite3": "^5.0.0",
-    "util": "^0.12.3",
-    "win32-api": "^9.5.0",
     "ytdl-core": "^3.4.2"
   }
 }
