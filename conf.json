@@ -1,5 +1,5 @@
 {
-    "token":"NzUzNTc4MjUyMDQ3NzQ1MDU1.X1oOcA.aOsw3oBblX3GxL4Lu29jrGNH47s",
+    "token":"NzUzNTc4MjUyMDQ3NzQ1MDU1.X1oOcA.jExNust_Y5buPQ63zdZoyKPe1dc",
     "OwnerID":"595345498379124756",
     "logschannel": "768809554594234398",
     "prefix": ".",
@@ -7,6 +7,7 @@
     "announcementchannel":"748534353939660804",
     "updatechannel":"748534353939660805",
     "hasteurl": "https://hastebin.com",
-    "version":"1.07",
-    "modlogsspacechatid":"748560569375784981"
+    "version":"1.12",
+    "modlogsspacechatid":"748560569375784981",
+    "Mongo": "mongodb://cheslin23t:Wintermc23t@spaceholddb-shard-00-00.mojbi.gcp.mongodb.net:27017,spaceholddb-shard-00-01.mojbi.gcp.mongodb.net:27017,spaceholddb-shard-00-02.mojbi.gcp.mongodb.net:27017/test?replicaSet=atlas-7jxudw-shard-0&ssl=true&authSource=admin"
 }

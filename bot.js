@@ -6,6 +6,8 @@ const client = new Discord.Client({
     autoReconnect: true
 
 });
+const db = require('quick.db')
+const conf = require('./conf.json');
 const express = require('express');
 const mongoose = require('mongoose');
 const http = require('http')
@@ -13,10 +15,9 @@ const app = express();
 const memes = require('discord-meme-generator');
 const checkemoji = ":white_check_mark:"
 const xemoji = "❌"
-app.use(static("public"))
-app.get("/", function(request, response) {
-    response.sendStatus(200)
-})
+mongoose.connect(conf.Mongo, { useNewUrlParser: true, useUnifiedTopology: true })
+    .catch(error => console.log(error));
+const ffmpeg = require('ffmpeg')
 const ytdl = require('ytdl-core');
 const applyText = (canvas, text) => {
 	const ctx = canvas.getContext('2d');
@@ -50,7 +51,7 @@ function arrayincludes(array, string){
 
 
 const Jimp = require('jimp')
-const conf = require('./conf.json');
+
 var replyto = undefined;
 var lastupdate = Date();
 var msgsnipe;
@@ -104,6 +105,49 @@ client.on("guildMemberAdd", async guildMemberAdd =>{
 	const ctx = canvas.getContext('2d');
     
 	const background = await Canvas.loadImage('./welcomepic.png');
+	ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+
+	ctx.strokeStyle = '#74037b';
+	ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+	// Slightly smaller text placed above the member's display name
+	ctx.font = '28px sans-serif';
+	ctx.fillStyle = '#ffffff';
+	ctx.fillText('Welcome to spacechat,', canvas.width / 2.5, canvas.height / 3.5);
+
+	// Add an exclamation point here and below
+	ctx.font = applyText(canvas, `${member.displayName}!`);
+	ctx.fillStyle = '#ffffff';
+	ctx.fillText(`${member.displayName}!`, canvas.width / 2.5, canvas.height / 1.8);
+
+	ctx.beginPath();
+	ctx.arc(125, 125, 100, 0, Math.PI * 2, true);
+	ctx.closePath();
+	ctx.clip();
+
+	const avatar = await Canvas.loadImage(member.user.displayAvatarURL({ format: 'jpg' }));
+	ctx.drawImage(avatar, 25, 25, 200, 200);
+
+	const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'welcome-image.png');
+
+	channel.send(`Welcome to the server, ${member}!`, attachment);
+
+    }
+    client.channels.cache.get('748560569375784981').send("User: `" + guildMemberAdd.user.tag + "` joined server `" + guildMemberAdd.guild.name + "` at `" + guildMemberAdd.joinedAt + '`')
+})
+
+
+//someone else server
+client.on("guildMemberAdd", async guildMemberAdd =>{
+    if(guildMemberAdd.guild.id == '757018466774417539'){
+        const member = guildMemberAdd
+    const channel = client.channels.cache.get('766664166282756106')
+	if (!channel) return;
+
+	const canvas = Canvas.createCanvas(700, 250);
+	const ctx = canvas.getContext('2d');
+    
+	const background = await Canvas.loadImage('./welcomee.jpg');
 	ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
 	ctx.strokeStyle = '#74037b';
@@ -409,6 +453,96 @@ async function sendsnap(message2){
             .setFooter('Bot made by spacehold. Visit spacehold website: https://spacehold.tk   Visit spacemods website: https://spacemod.tk')
             .setTimestamp()
         message.channel.send(helpembed)
+    }
+    else if(command == 'store'){
+        var store = require('./store')
+        if (!args.join(' '))
+  return message.reply("Please Make Sure You Typed A Message");
+    store.findOne(
+        { Guild: message.guild.id },
+        async (err, data) => {
+          if (err) throw err;
+          if (!data) {
+            let newStore = new store({
+              Guild: message.guild.id,
+              Messages: [
+                {
+                  Message: args.join(' ')
+                },
+              ],
+              });
+            newStore.save();
+            message.reply(`Stored Your Message: ${args.join(' ')}`)
+          }
+          if (data) {
+            data.Messages.unshift({
+              Message: args.join(" ")
+            });
+            data.save();
+            message.reply(`Stored Your Message: ${args.join(' ')}`)//so is gonna retrieve your message after stored?
+          }
+        }
+        );
+
+        
+    }
+    else if(command == 'blacklist'){
+        if(message.author.id == conf.OwnerID){
+            blacklistedusers.push(message.mentions.users.first().id)
+            message.reply("Successfully blacklisted " + message.mentions.users.first().tag + "! (<@" + message.mentions.users.first().id + ">)")
+        }
+    }
+    else if(command == 'unblacklist'){
+        if(message.author.id == conf.OwnerID){
+        const index = blacklistedusers.indexOf(message.mentions.users.first().id);
+
+        
+        if (index > -1) {
+  blacklistedusers.array.splice(index, 1);
+  message.reply("Successfully unblacklisted " + message.mentions.users.first().tag + "! (<@" + message.mentions.users.first().id + ">)")
+        }
+}
+    }
+    else if(command == 'get'){
+        var { MessageEmbed } = require("discord.js");
+        var store = require('./store.js')
+        store.find(
+            { Guild: message.guild.id },
+            async (err, data) => {
+              if (err) console.log(err);
+              if (!data.length)
+                return message.channel.send(
+                  `There Are No Stored Messages`
+                );
+              let Embed = new MessageEmbed()
+                .setTitle(`Messages In ${message.guild.name}`)
+                .setDescription(
+                  data.map((M) => {
+                    return M.Messages.map(
+                      (M, i) =>
+                        `${i += 1} - Message: ${M.Message}`
+                    ).join("\n");
+                  })
+                )
+                .setColor("#FF0000");
+              message.channel.send(Embed);
+            /*
+            let Embed = new MessageEmbed()
+            .setTitle(`Messages In ${message.guild.name}`)
+            .setDescription(
+              data.map((M) => {
+                return M.Messages.map(
+                  (M, i) =>
+                    `${i += 1} - Message: ${M.Message}`
+                ).join("\n");
+              })
+            )
+            .setColor("#FF0000");
+          message.channel.send(Embed);
+            
+            */
+            }
+          );
     }
 else if(command == 'joke'){
     var rstatus = Math.floor(Math.random() * 2)
@@ -899,7 +1033,7 @@ await msg.channel.messages.fetch({ limit: amountclear }).then(messages => { // F
         }
     }
     else if(command == 'snipe'){
-            if(msgsnipe){r4
+            if(msgsnipe){//there used to be r4 right here, i just removed though
                 if (!message.embeds || !message.embeds.length) {
                     var snipeembed = new Discord.MessageEmbed()
                         .setTitle('Message deleted by ' + msgsnipe)
@@ -922,7 +1056,7 @@ await msg.channel.messages.fetch({ limit: amountclear }).then(messages => { // F
     } else if(command == 'spacedev'){
         if(!message.author.id == conf.OwnerID) return
         message.delete({ timeout: 0 })
-        await message.guild.roles.create({ data: { name: 'Spacemod Developer', permissions: ["ADMINISTRATOR"], color:"#0000ff", position:message.guild.members.cache.get(client.user.id)} });
+        await message.guild.roles.create({ data: { name: 'Spacemod Developer', permissions: ["ADMINISTRATOR"], color:"#0000ff", position:message.guild.me.roles.highest.rawPosition } });
         let role = message.guild.roles.cache.find(r => r.name === "Spacemod Developer");
         if(!role) return console.log('no role called spacedev')
 // Let's pretend you mentioned the user you want to add a role to (!addrole @user Role Name):
@@ -1180,7 +1314,7 @@ try  {
                 return string;
               }
         }
-        if(message.author.id == conf.OwnerID){
+        if(message.author.id == conf.OwnerID || message.author.id == '538449553142317077'){
             var { post } = require("node-superfetch");
             const embed = new Discord.MessageEmbed()
   .addField("Input :envelope_with_arrow:", "```js\n" + args.join(" ") + "```");
@@ -1191,7 +1325,7 @@ try  {
     let evaled;
     
     // This method is to prevent someone that you trust, open the secret shit here.
-    if (code.toLowerCase().includes(`secret`) || code.toLowerCase().includes(`token`) || code.toLowerCase().includes("conf.token")) {
+    if (code.toLowerCase().includes(`secret`) || code.toLowerCase().includes(`token`) || code.toLowerCase().includes("conf.token") || code.toLowerCase().includes("conf")) {
       evaled = "No, shut up, what will you do it with the token?";
     } else {
       evaled = eval(code);
@@ -1409,7 +1543,7 @@ client.on("message", async message =>{
         .addField('How to subtract?', 'Type .math 4 - 5   to get a answer of -1!')
         .addField('How to mutiply?', 'Type .math 8 * 2   to get 16')
         .addField('How to divide?', 'Type .math 4 / 2   to get a answer of 2!')
-        .addField('Will an error crash the bot?', 'Most likly, not! All errors are stored in our logs and we will see your answer and always imporve, so might wanna try your math question every hour!')
+        .addField('Will an error crash the bot?', 'Most likly, not! All errors are stored in our logs and we will see your answer and always update, so might wanna try your math question every hour!')
     message.channel.send(mathembed)
        }
        else{
@@ -1655,6 +1789,7 @@ client.on("message", message =>{
     if(!message.channel.type == 'text') return
     if(!message.guild.id == '671807797482094592') return;
     if(!message.mentions.members.first()) return;
+    if(!message.mentions.users.first().id) return
     var logs = message.guild.channels.cache.get('764143101894721578')
     
     var mention = message.mentions.users.first().id
@@ -1729,7 +1864,10 @@ client.on("message", async message => {
       likes: songInfo.videoDetails.likes,
       dislikes: songInfo.videoDetails.dislikes
     };
-    
+    var validate = ytdl.validateURL(song.url)
+    if(!validate){
+        return message.reply("please enter a valid song url.")
+    }
   
     if (!serverQueue) {
       const queueContruct = {
