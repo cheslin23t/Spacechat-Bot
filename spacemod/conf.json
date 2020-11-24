@@ -1,6 +1,6 @@
 
 {
-    "Please only edit the brown text, dont edit the quotation marks though! You can keep the mongo string empty if you want, but the .store and .get command will give you errors":"",
+    "Please only edit the brown text, don't edit the quotation marks though! You can keep the mongo string empty if you want, but the .store and .get command will give you errors":"",
     "OwnerID":"595345498379124756",
     "logschannel": "768809554594234398",
     "prefix": ".",
