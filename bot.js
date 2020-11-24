@@ -1,4 +1,11 @@
-var randomColor = require('randomcolor'); // import the script
+const conf = require('./conf.json');
+const colors = require("colors")
+if(conf.Mongo == undefined || conf.Mongo == ""){
+    console.log("Please ignore the error if there is a error something like ".yellow + "Connection string invalid".red.bold + ", it will not crash the bot, but the .get and the .store commands will not work...".yellow)
+    console.log("Waiting 5 seconds before starting the bot".yellow.bgBlue)
+}
+setTimeout(() => {
+    var randomColor = require('randomcolor'); // import the script
 var color = randomColor(); // a hex code for an attractive color
 const Canvas = require('canvas')
 const Discord = require('discord.js');
@@ -6,8 +13,7 @@ const client = new Discord.Client({
     autoReconnect: true
 
 });
-const db = require('quick.db')
-const conf = require('./conf.json');
+
 const express = require('express');
 const mongoose = require('mongoose');
 const http = require('http')
@@ -455,6 +461,7 @@ async function sendsnap(message2){
         message.channel.send(helpembed)
     }
     else if(command == 'store'){
+        if(conf.Mongo == undefined || conf.Mongo == "") return message.reply("sorry, the owner has not set up the connection string for our database")
         var store = require('./store')
         if (!args.join(' '))
   return message.reply("Please Make Sure You Typed A Message");
@@ -504,6 +511,7 @@ async function sendsnap(message2){
 }
     }
     else if(command == 'get'){
+        if(conf.Mongo == undefined || conf.Mongo == "") return message.reply("sorry, the owner has not set up the connection string for our database")
         var { MessageEmbed } = require("discord.js");
         var store = require('./store.js')
         store.find(
@@ -939,7 +947,7 @@ await msg.channel.messages.fetch({ limit: amountclear }).then(messages => { // F
         if(message.author.id == conf.OwnerID){
             message.channel.send('Restarting...')
             client.destroy();
-            client.login(conf.token);
+            client.login(require('../conf.json').token);
             setTimeout(() => {
                 client.emit('ready')
             }, 2000);
@@ -1165,7 +1173,7 @@ member.roles.add(role)
                         client.user.setStatus('invisible')
                         client.destroy()
                         setTimeout(() => {
-                                client.login(conf.token)
+                                client.login(require('../conf.json').token)
                                 setTimeout(() => {
                                     client.user.setStatus('online')
                                     message.channel.send('Restarted successfully!')
@@ -2014,4 +2022,5 @@ client.on("message", message =>{
 
 
 
-client.login(conf.token)
+client.login(require('../conf.json').token)
+}, 5000);
