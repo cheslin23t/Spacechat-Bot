@@ -1,14 +1,3 @@
-
 {
-    "Please only edit the brown text, dont edit the quotation marks though! You can keep the mongo string empty if you want, but the .store and .get command will give you errors":"",
-    "OwnerID":"595345498379124756",
-    "logschannel": "768809554594234398",
-    "prefix": ".",
-    "staffID":"748534353214177328",
-    "announcementchannel":"748534353939660804",
-    "updatechannel":"748534353939660805",
-    "hasteurl": "https://hastebin.com",
-    "version":"1.12",
-    "modlogsspacechatid":"748560569375784981",
-    "Mongo": ""
+    "token":"yourtoken"
 }
